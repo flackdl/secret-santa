@@ -108,36 +108,41 @@
               participants.splice(i, 1);
             },
             assign: function() {
-              var MAX = 100;
-              var i = 0;
-              var unassigned = _.clone(participants).sort();
-              while(unassigned.length) {
+              assigned = [];
+              
+              _.forEach(participants.slice(), function(participant, index) {
                 
-                // failed assignment
-                if (i++ >= MAX) {
-                  console.log('broken');
-                  break;
-                }
-                
-                var participant = unassigned.shift();
                 var matched = false;
                 
-                // try and find a match in the unassigned participants
-                _.forEach(unassigned.slice(), function(unassigned_participant, index) {
-                  // can match
-                  if (true) {
-                    assigned.push(new Match(participant, unassigned_participant));
-                    matched = true;
-                    return false;
+                while(!matched) {
+                  
+                  // max attempts
+                  if (index >= participants.length) {
+                    console.log('broken');
+                    break;
                   }
-                })
-                if (!matched) {
-                  console.log('could not get match, broke'); 
-                  break;
+                  
+                  // remove self, assigned and disallows
+                  available_recipients = _.filter(participants, function(p) {
+                    return (p.email != participant.email) && !_.find(assigned, function(a) {return a.recipient.email == p.email});
+                  });
+                  
+                  console.log(_.map(available_recipients, function(a) {return a.email}));
+                  
+                  if (!available_recipients.length) {
+                    console.log('broken');
+                    break;
+                  }
+                  
+                  var chosen = available_recipients[_.random(available_recipients.length - 1)];
+                  
+                  assigned.push(new Match(participant, chosen));
+                  matched = true;
                 }
-              }
+              }),
               console.log(assigned);
-            },
+              console.log(_.map(assigned, function(a) {return {from: a.buyer.email, to: a.recipient.email}}));
+            }
           },
        }) 
     </script>
