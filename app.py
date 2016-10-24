@@ -3,9 +3,9 @@ from flask import Flask, request, render_template, render_template_string, Respo
 
 app = Flask(__name__, static_url_path='/static')
 
-@app.route('/css/<path:filename>')
+@app.route('/<path:filename>')
 def download_file(filename):
-    return send_from_directory('static/css', filename)
+    return send_from_directory('static/', filename)
 
 
 @app.route('/')
