@@ -11,7 +11,7 @@ var Match = function(buyer, recipient) {
 // start off with a list of blank participants
 var participants = [];
 _.forEach(_.range(0, 4), function(v, i) {
-    participants.push(new Person(i, i+'@'+i+'.com'));
+    participants.push(new Person('Name ' + i, i+'@'+i+'.com'));
 });
 
 var assign = function() {
@@ -45,7 +45,7 @@ var assign = function() {
     }
   }),
   console.log(assigned);
-  //console.log(_.map(assigned, function(a) {return {from: a.buyer.email, to: a.recipient.email}}));
+  console.log(_.map(assigned, function(a) {return {from: a.buyer.email, to: a.recipient.email}}));
   return assigned;
 };
 
@@ -57,6 +57,7 @@ var app = new Vue({
   },
   methods: {
     addParticipant: function() {
+      console.log('f');
       participants.push(new Person());
     },
     removeParticipant: function(i) {
@@ -73,7 +74,9 @@ var app = new Vue({
         }
     },
     exceptions: function (participant) {
-      return _.filter(participants, function(p) {return p.email != participant.email});
+      var exceptions = _.filter(participants, function(p) {return p.email != participant.email});
+      exceptions.unshift();
+      return exceptions;
     },
   },
 }) 
