@@ -44,7 +44,7 @@
       <div class="jumbotron">
         <h1>Give the gift of gifts</h1>
         <p class="lead">Fill out the participants below and have them randomly assigned</p>
-        <p><a class="btn btn-lg btn-primary" href="#participants" role="button">Get Started</a></p>
+        <p><a class="btn btn-lg btn-info" href="#participants" role="button">Get Started</a></p>
       </div>
 
       <div class="row marketing">
@@ -72,13 +72,15 @@
                 <div class="checkbox">
                   <label>
                     <input type="checkbox" value="">
-                    Hide results and email each buyer
+                    Keep results hidden and privately email each buyer
                   </label>
                 </div> 
               </div>
             </div>
             <div>
-              <a v-on:click="assign()" class="btn btn-success btn-block"><span class="glyphicon glyphicon-random"> </span> Assign</a>
+              <button type="button" v-on:click="assign()" class="btn btn-success btn-lg btn-block assign">
+                <span class="glyphicon glyphicon-random"></span> Assign
+              </button>
             </div>
           </form>
         </div>
