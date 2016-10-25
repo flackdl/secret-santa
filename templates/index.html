@@ -78,20 +78,26 @@
               </div>
             </div>
             <div>
-              <button type="button" v-on:click="assign()" class="btn btn-success btn-lg btn-block assign">
+              <a href="#results" v-on:click="assign()" class="btn btn-success btn-lg btn-block assign">
                 <span class="glyphicon glyphicon-random"></span> Assign
-              </button>
+              </a>
             </div>
           </form>
         </div>
       </div>
       
-      <div class="row marketing">
-        Results
-        <div class="col-lg-12">
-         <div v-for="participant in assigned">
-           {$ participant.buyer.name $} got {$ participant.recipient.name $}
-         </div> 
+      <div id="results" class="row marketing">
+        <!-- error -->
+        <div class="col-lg-12" v-if="error">
+          <div class="alert alert-block alert-danger"><h4>{$ error $}</h4></div>
+        </div>
+        <!-- success -->
+        <div class="col-lg-12" v-if="assigned.length">
+          <div class="alert alert-block alert-success"><h4>Successfully matched everyone!</h4></div>
+          <h2>Results</h2>
+          <div v-for="participant in assigned">
+            {$ participant.buyer.name $} buys a gift for {$ participant.recipient.name $}
+          </div> 
         </div>
       </div>
 

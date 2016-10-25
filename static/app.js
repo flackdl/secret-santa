@@ -14,6 +14,7 @@ var init_participants = function() {
   _.forEach(_.range(0, 4), function(v, i) {
       participants.push(new Person('Name ' + i, i+'@'+i+'.com'));
   });
+  return participants;
 }
 
 var assign = function(participants) {
@@ -21,43 +22,34 @@ var assign = function(participants) {
   
   _.forEach(participants.slice(), function(participant, index) {
     
-    var matched = false;
+    // remove self, assigned and exceptions
+    var available_recipients = _.filter(participants, function(p) {
+      // self
+      if (p.email == participant.email) {
+        return false; 
+      }
+      // assigned
+      if (_.find(assigned, function(a) {return a.recipient.email == p.email})) {
+        return false; 
+      }
+      // exception
+      if (participant.exception && participant.exception.email == p.email) {
+        return false;
+      }
+      return true;
+    });
     
-    i=0;
-    while(!matched) {
-      
-      // max attempts
-      if (index >= participants.length) {
-        throw 'Failed matching';
-      }
-      
-      // remove self, assigned and exceptions
-      available_recipients = _.filter(participants, function(p) {
-        // self
-        if (p.email == participant.email) {
-          return false; 
-        }
-        // assigned
-        if (_.find(assigned, function(a) {return a.recipient.email == p.email})) {
-          return false; 
-        }
-        // exception
-        if (participant.exception && participant.exception.email == p.email) {
-          return false;
-        }
-        return true;
-      });
-      
-      if (!available_recipients.length) {
-        throw 'Failed matching';
-      }
-      
-      var chosen = available_recipients[_.random(available_recipients.length - 1)];
-      assigned.push(new Match(participant, chosen));
-      matched = true;
+    // choose a random participant
+    if (available_recipients.length) {
+      assigned.push(new Match(
+        participant, available_recipients[_.random(available_recipients.length - 1)]));
+    } else {
+      throw 'Failed matching';
     }
-  }),
+  });
+  
   console.log(assigned);
+  
   return assigned;
 };
 
@@ -67,7 +59,7 @@ var app = new Vue({
   data: {
     participants: init_participants(),
     assigned: [],
-    error = null;
+    error: null,
   },
   methods: {
     addParticipant: function() {
@@ -80,15 +72,16 @@ var app = new Vue({
         var i = 0;
         this.assigned = [];
         // have a reasonable attempt limit
-        while(!this.assigned.length && i++ < this.participants.length * 10) {
+        while(!this.assigned.length && i++ <= 100) {
+          this.assigned = [];
             try {
-                this.assigned = assign();
+                this.assigned = assign(this.participants);
             } catch (e) {
                 console.log(e); 
             }
         }
         if (!this.assigned.length) {
-          this.error = 'Failed assigning.  Too many match exceptions?';
+          this.error = 'Failed assigning.  Are there too many matching exceptions?';
         }
     },
     exceptions: function (participant) {
