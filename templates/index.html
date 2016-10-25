@@ -67,14 +67,18 @@
                 <a class="btn btn-link" v-on:click="removeParticipant(index)">x</a>
               </div>
             </div>
-            <div>
-              <div class="form-control">
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" name="secret">
-                    Privately email each participant their recipient
-                  </label>
-                </div> 
+            <div class="form-control">
+              <div class="radio">
+                <label>
+                  <input type="radio" name="secret" v-model="secret" value="0" checked>
+                  Display results
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="secret" v-model="secret" value="1">
+                  Hide results and email individual participants
+                </label>
               </div>
             </div>
             <div>
@@ -89,14 +93,16 @@
       <div id="results" class="row marketing">
         <!-- error -->
         <div class="col-lg-12" v-if="error">
-          <div class="alert alert-block alert-danger"><h4>{$ error $}</h4></div>
+          <div class="alert alert-block alert-danger"><h4><strong>Failed assigning!</strong>{$ error $}</h4></div>
         </div>
         <!-- success -->
         <div class="col-lg-12" v-if="assigned.length">
           <div class="alert alert-block alert-success"><h4>Successfully matched everyone!</h4></div>
           <h2>Results</h2>
           <div v-for="participant in assigned">
-            {$ participant.buyer.name $} buys a gift for {$ participant.recipient.name $}
+            {$ participant.buyer.name $} buys a gift for
+            <span v-if="secret">[secret]</span>
+            <span v-if="!secret">{$ participant.recipient.name $}</span>
           </div> 
         </div>
       </div>

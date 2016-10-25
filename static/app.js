@@ -60,6 +60,7 @@ var app = new Vue({
     participants: init_participants(),
     assigned: [],
     error: null,
+    secret: false,
   },
   methods: {
     addParticipant: function() {
@@ -81,7 +82,7 @@ var app = new Vue({
             }
         }
         if (!this.assigned.length) {
-          this.error = 'Failed assigning.  Are there too many matching exceptions?';
+          this.error = 'There are too many matching exceptions';
         }
     },
     exceptions: function (participant) {
