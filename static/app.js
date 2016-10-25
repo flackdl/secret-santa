@@ -8,19 +8,22 @@ var Match = function(buyer, recipient) {
     this.recipient = recipient;
 }
 
-// start off with a list of blank participants
-var participants = [];
-_.forEach(_.range(0, 4), function(v, i) {
-    participants.push(new Person('Name ' + i, i+'@'+i+'.com'));
-});
+var init_participants = function() {
+  // start off with a list of blank participants
+  var participants = [];
+  _.forEach(_.range(0, 4), function(v, i) {
+      participants.push(new Person('Name ' + i, i+'@'+i+'.com'));
+  });
+}
 
-var assign = function() {
+var assign = function(participants) {
   var assigned = [];
   
   _.forEach(participants.slice(), function(participant, index) {
     
     var matched = false;
     
+    i=0;
     while(!matched) {
       
       // max attempts
@@ -30,10 +33,20 @@ var assign = function() {
       
       // remove self, assigned and exceptions
       available_recipients = _.filter(participants, function(p) {
-        return (p.email != participant.email) && !_.find(assigned, function(a) {return a.recipient.email == p.email});
+        // self
+        if (p.email == participant.email) {
+          return false; 
+        }
+        // assigned
+        if (_.find(assigned, function(a) {return a.recipient.email == p.email})) {
+          return false; 
+        }
+        // exception
+        if (participant.exception && participant.exception.email == p.email) {
+          return false;
+        }
+        return true;
       });
-      
-      //console.log(_.map(available_recipients, function(a) {return a.email}));
       
       if (!available_recipients.length) {
         throw 'Failed matching';
@@ -45,36 +58,41 @@ var assign = function() {
     }
   }),
   console.log(assigned);
-  console.log(_.map(assigned, function(a) {return {from: a.buyer.email, to: a.recipient.email}}));
   return assigned;
 };
 
 var app = new Vue({
-  el: '#participants',
+  el: '#secret-santa',
   delimiters: ['{$', '$}'],
   data: {
-    participants: participants,
+    participants: init_participants(),
+    assigned: [],
+    error = null;
   },
   methods: {
     addParticipant: function() {
-      console.log('f');
-      participants.push(new Person());
+      this.participants.push(new Person());
     },
     removeParticipant: function(i) {
       participants.splice(i, 1);
     },
     assign: function() {
-        var assigned = []
-        while(!assigned.length) {
+        var i = 0;
+        this.assigned = [];
+        // have a reasonable attempt limit
+        while(!this.assigned.length && i++ < this.participants.length * 10) {
             try {
-                assigned = assign();
+                this.assigned = assign();
             } catch (e) {
                 console.log(e); 
             }
         }
+        if (!this.assigned.length) {
+          this.error = 'Failed assigning.  Too many match exceptions?';
+        }
     },
     exceptions: function (participant) {
-      var exceptions = _.filter(participants, function(p) {return p.email != participant.email});
+      var exceptions = _.filter(this.participants, function(p) {return p.email != participant.email});
       exceptions.unshift();
       return exceptions;
     },
