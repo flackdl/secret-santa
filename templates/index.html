@@ -47,20 +47,21 @@
         <p><a class="btn btn-lg btn-info" href="#participants" role="button">Get Started</a></p>
       </div>
 
-      <div class="row marketing">
+      <div class="row marketing" id="participants">
         <div class="col-lg-12">
-          <form class="form-inline">
+          <form class="form-inline"  v-on:submit.prevent="assign">
             <h2>Participants <a v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</a></h2>
             <div v-for="(participant, index) in participants">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="Name" v-model="participant.name">
+              <div class="form-group" v-bind:class="{ 'has-error': errors.has('name' + index) }">
+                <input type="text" name="name" class="form-control" placeholder="Name" v-model="participant.name" v-validate data-rules="required" v-bind:name="'name' + index">
+              </div>
+              <div class="form-group" v-bind:class="{ 'has-error': errors.has('email' + index) }">
+                <input type="email" v-bind:name="'email' + index" v-validate data-rules="required|email" class="form-control" placeholder="Email" v-model="participant.email">
               </div>
               <div class="form-group">
-                <input type="email" class="form-control" placeholder="Email" v-model="participant.email">
-              </div>
-              <div class="form-group">
-                <select class="form-control" v-model="participant.exception">
-                  <option v-for="exception in exceptions(participant)" v-bind:value="exception">Prevent matching with {$ exception.name $}</option>
+                <select class="form-control" v-model="participant.exception" v-bind:disabled="participants.length <= 1">
+                  <option value="">-- can match with anyone --</option>
+                  <option v-for="exception in exceptions(participant)" v-bind:value="exception">Don't match with {$ exception.name $}</option>
                 </select>
               </div>
               <div class="form-group">
@@ -70,7 +71,7 @@
             <div class="form-control">
               <div class="radio">
                 <label>
-                  <input type="radio" name="secret" v-model="secret" value="0" checked>
+                  <input type="radio" name="secret" v-model="secret" value="0">
                   Display results
                 </label>
               </div>
@@ -82,9 +83,9 @@
               </div>
             </div>
             <div>
-              <a href="#results" v-on:click="assign()" class="btn btn-success btn-lg btn-block assign">
+              <button class="btn btn-success btn-lg btn-block assign" v-bind:class="{disabled: errors.any() }" v-bind:disabled="errors.any()">
                 <span class="glyphicon glyphicon-random"></span> Assign
-              </a>
+              </button>
             </div>
           </form>
         </div>
@@ -93,11 +94,11 @@
       <div id="results" class="row marketing">
         <!-- error -->
         <div class="col-lg-12" v-if="error">
-          <div class="alert alert-block alert-danger"><h4><strong>Failed assigning!</strong>{$ error $}</h4></div>
+          <div class="alert alert-block alert-danger"><strong>Failed assigning!</strong>{$ error $}</div>
         </div>
         <!-- success -->
         <div class="col-lg-12" v-if="assigned.length">
-          <div class="alert alert-block alert-success"><h4>Successfully matched everyone!</h4></div>
+          <div class="alert alert-block alert-info"><strong>Successfully matched everyone!</strong></div>
           <h2>Results</h2>
           <div v-for="participant in assigned">
             {$ participant.buyer.name $} buys a gift for
@@ -114,6 +115,7 @@
     </div> <!-- /container -->
     
    <script src="https://unpkg.com/vue@next/dist/vue.js"></script>
+   <script src="https://cdn.jsdelivr.net/vee-validate/2.0.0-beta.13/vee-validate.min.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.4/lodash.min.js"></script>
    <script src="/app.js"></script>
 

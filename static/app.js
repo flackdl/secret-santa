@@ -1,8 +1,9 @@
 var Person = function(name, email) {
     this.name = name;
     this.email = email;
-    this.exception = null;
+    this.exception = '';
 }
+
 var Match = function(buyer, recipient) {
     this.buyer = buyer;
     this.recipient = recipient;
@@ -14,6 +15,7 @@ var init_participants = function() {
   _.forEach(_.range(0, 4), function(v, i) {
       participants.push(new Person('Name ' + i, i+'@'+i+'.com'));
   });
+  
   return participants;
 }
 
@@ -48,11 +50,10 @@ var assign = function(participants) {
     }
   });
   
-  console.log(assigned);
-  
   return assigned;
 };
 
+Vue.use(VeeValidate);
 var app = new Vue({
   el: '#secret-santa',
   delimiters: ['{$', '$}'],
@@ -67,11 +68,19 @@ var app = new Vue({
       this.participants.push(new Person());
     },
     removeParticipant: function(i) {
-      participants.splice(i, 1);
+      this.participants.splice(i, 1);
     },
-    assign: function() {
+    assign: function(e) {
         var i = 0;
         this.assigned = [];
+        // remove untouched participants
+        var app = this;
+        _.each(this.participants.slice(), function(participant, index) {
+          if (!app.fields['name' + index].dirty) {
+            console.log('deleting', app.fields['name' + index]);
+            app.participants.splice(index, 1);
+          }
+        });
         // have a reasonable attempt limit
         while(!this.assigned.length && i++ <= 100) {
           this.assigned = [];
@@ -84,6 +93,7 @@ var app = new Vue({
         if (!this.assigned.length) {
           this.error = 'There are too many matching exceptions';
         }
+        e.preventDefault();
     },
     exceptions: function (participant) {
       var exceptions = _.filter(this.participants, function(p) {return p.email != participant.email});
