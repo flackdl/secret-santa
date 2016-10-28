@@ -71,17 +71,15 @@ var app = new Vue({
       this.participants.splice(i, 1);
     },
     assign: function(e) {
-        var i = 0;
+      
+        // remove blank entries
+        this.participants = _.filter(this.participants, function(p) {return p.name});
+        
+        // reset assignments
         this.assigned = [];
-        // remove untouched participants
-        var app = this;
-        _.each(this.participants.slice(), function(participant, index) {
-          if (!app.fields['name' + index].dirty) {
-            console.log('deleting', app.fields['name' + index]);
-            app.participants.splice(index, 1);
-          }
-        });
-        // have a reasonable attempt limit
+        
+        // use a reasonable attempt limit
+        var i = 0;
         while(!this.assigned.length && i++ <= 100) {
           this.assigned = [];
             try {
@@ -91,7 +89,7 @@ var app = new Vue({
             }
         }
         if (!this.assigned.length) {
-          this.error = 'There are too many matching exceptions';
+          this.error = 'There are too many exceptions to assign correctly';
         }
         e.preventDefault();
     },
