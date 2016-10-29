@@ -13,7 +13,7 @@ var init_participants = function() {
   // start off with a list of blank participants
   var participants = [];
   _.forEach(_.range(0, 4), function(v, i) {
-      participants.push(new Person('Name ' + i, i+'@'+i+'.com'));
+      participants.push(new Person());
   });
   
   return participants;
@@ -73,7 +73,8 @@ var app = new Vue({
     assign: function(e) {
       
         // remove blank entries
-        this.participants = _.filter(this.participants, function(p) {return p.name});
+        this.participants = _.filter(this.participants, function(p) {return p.name || p.email});
+        this.$validator.validateAll();
         
         // reset assignments
         this.assigned = [];
