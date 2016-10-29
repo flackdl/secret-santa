@@ -2,6 +2,10 @@ var Person = function(name, email) {
     this.name = name;
     this.email = email;
     this.exception = '';
+    this.errors = [];
+}
+Person.prototype.has_error = function (name) {
+  return _.indexOf(this.errors, name) != -1;
 }
 
 var Match = function(buyer, recipient) {
@@ -13,10 +17,15 @@ var init_participants = function() {
   // start off with a list of blank participants
   var participants = [];
   _.forEach(_.range(0, 4), function(v, i) {
-      participants.push(new Person());
+      participants.push(new Person('Name ' + i, i + '@email.com'));
   });
   
   return participants;
+}
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
 }
 
 var assign = function(participants) {
@@ -53,7 +62,6 @@ var assign = function(participants) {
   return assigned;
 };
 
-Vue.use(VeeValidate);
 var app = new Vue({
   el: '#secret-santa',
   delimiters: ['{$', '$}'],
@@ -74,7 +82,11 @@ var app = new Vue({
       
         // remove blank entries
         this.participants = _.filter(this.participants, function(p) {return p.name || p.email});
-        this.$validator.validateAll();
+        
+        if (!this.validate()) {
+          console.log('not valid so not assigning');
+          return;
+        }
         
         // reset assignments
         this.assigned = [];
@@ -92,12 +104,47 @@ var app = new Vue({
         if (!this.assigned.length) {
           this.error = 'There are too many exceptions to assign correctly';
         }
-        e.preventDefault();
     },
     exceptions: function (participant) {
       var exceptions = _.filter(this.participants, function(p) {return p.email != participant.email});
       exceptions.unshift();
       return exceptions;
+    },
+    is_valid: function () {
+      var valid = true;
+      _.forEach(this.participants.slice(), function(participant, index) {
+        if (participant.errors.length) {
+          valid = false;
+          return;
+        }
+      });
+      return valid;
+    },
+    validate: function() {
+      _.forEach(this.participants.slice(), function(participant, index) {
+        if (!participant.name.length) {
+          participant.errors.push('name');
+        } else {
+          participant.errors = _.filter(participant.errors, function(e) {
+            return e != 'name';
+          });
+        }
+        if (!validateEmail(participant.email)) {
+          participant.errors.push('email');
+        } else {
+          participant.errors = _.filter(participant.errors, function(e) {
+            return e != 'email';
+          });
+        }
+      });
+      console.log(this.participants);
+      return this.is_valid();
+    },
+    clear_errors: function(participant, field) {
+      console.log(participant, field);
+      participant.errors = _.filter(participant.errors, function(e) {
+        return e != field;
+      });
     },
   },
 }) 

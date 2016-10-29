@@ -52,11 +52,11 @@
           <form class="form-inline" method="post" v-on:submit.prevent="assign">
             <h2>Participants <a v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</a></h2>
             <div v-for="(participant, index) in participants">
-              <div class="form-group" v-bind:class="{ 'has-error': errors.has('name' + index) }">
-                <input type="text" name="name" class="form-control" placeholder="Name" v-model="participant.name" v-validate data-rules="required" v-bind:name="'name' + index">
+              <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
+                <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="clear_errors(participant, 'name')" v-model="participant.name" v-bind:name="'name' + index">
               </div>
-              <div class="form-group" v-bind:class="{ 'has-error': errors.has('email' + index) }">
-                <input type="email" v-bind:name="'email' + index" v-validate data-rules="required|email" class="form-control" placeholder="Email" v-model="participant.email">
+              <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('email') }">
+                <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="clear_errors(participant, 'email')" v-model="participant.email">
               </div>
               <div class="form-group">
                 <select class="form-control" v-model="participant.exception" v-bind:disabled="participants.length <= 1">
@@ -83,7 +83,7 @@
               </div>
             </div>
             <div>
-              <button class="btn btn-success btn-lg btn-block assign" v-bind:class="{disabled: errors.any() }" v-bind:disabled="errors.any()">
+              <button class="btn btn-success btn-lg btn-block assign" v-bind:class="{disabled: !is_valid() }" v-bind:disabled="!is_valid()">
                 <span class="glyphicon glyphicon-random"></span> Assign
               </button>
             </div>
@@ -115,7 +115,6 @@
     </div> <!-- /container -->
     
    <script src="https://unpkg.com/vue@next/dist/vue.js"></script>
-   <script src="https://cdn.jsdelivr.net/vee-validate/2.0.0-beta.13/vee-validate.min.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.4/lodash.min.js"></script>
    <script src="/app.js"></script>
 
