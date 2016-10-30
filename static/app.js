@@ -70,6 +70,7 @@ var app = new Vue({
     assigned: [],
     error: null,
     secret: false,
+    email_sent: false,
   },
   methods: {
     addParticipant: function() {
@@ -84,7 +85,6 @@ var app = new Vue({
         this.participants = _.filter(this.participants, function(p) {return p.name || p.email});
         
         if (!this.validate()) {
-          console.log('not valid so not assigning');
           return;
         }
         
@@ -98,7 +98,7 @@ var app = new Vue({
             try {
                 this.assigned = assign(this.participants);
             } catch (e) {
-                console.log(e); 
+                //console.log(e); 
             }
         }
         if (!this.assigned.length) {
@@ -106,6 +106,7 @@ var app = new Vue({
         }
     },
     exceptions: function (participant) {
+      // remove the participant as an exception option
       var exceptions = _.filter(this.participants, function(p) {return p.email != participant.email});
       exceptions.unshift();
       return exceptions;
@@ -137,14 +138,21 @@ var app = new Vue({
           });
         }
       });
-      console.log(this.participants);
       return this.is_valid();
     },
     clear_errors: function(participant, field) {
-      console.log(participant, field);
       participant.errors = _.filter(participant.errors, function(e) {
         return e != field;
       });
     },
+    send_emails: function() {
+      var app = this;
+      this.$http.get('/send-emails').then((response) => {
+        console.log('success', response);
+        app.email_sent = true;
+      }, (response) => {
+        console.log('failure', response);
+      });
+    }
   },
 }) 
