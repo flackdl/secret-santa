@@ -15,6 +15,8 @@ def index():
     
 @app.route('/send-emails')
 def send_emails():
+    # TODO
+    return jsonify({'success': True})
     response = requests.post(
         os.environ.get('MAILGUN_URL', "https://api.mailgun.net/v3/sandbox0aa36d7567cf488592e40d28b7984119.mailgun.org/messages"),
         auth=("api", os.environ.get('MAILGUN_KEY', 'key-e8ad4beedc7ee6c094f424c70548733f')),

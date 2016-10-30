@@ -106,7 +106,8 @@
             <span v-if="!secret">{$ participant.recipient.name $}</span>
           </div> 
           <div>
-            <button class="btn btn-primary btn-lg" v-bind:disabled="email_sent" v-on:click="send_emails()">Email Participants</button>
+            <button class="btn btn-primary btn-lg" v-if="!email_sent" v-on:click="send_emails()">Email Participants</button>
+            <button class="btn btn-success btn-lg disabled" disabled v-if="email_sent"><span class="glyphicon glyphicon-ok"></span> Emailed</button>
           </div>
         </div>
       </div>
