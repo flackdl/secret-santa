@@ -99,7 +99,6 @@ var app = new Vue({
             try {
                 this.assigned = assign(this.participants);
             } catch (e) {
-                //console.log(e); 
             }
         }
         if (!this.assigned.length) {
