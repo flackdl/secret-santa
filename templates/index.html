@@ -53,10 +53,10 @@
             <h2>Participants <a v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</a></h2>
             <div v-for="(participant, index) in participants">
               <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
-                <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="clear_errors(participant, 'name')" v-model="participant.name" v-bind:name="'name' + index">
+                <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index">
               </div>
               <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('email') }">
-                <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="clear_errors(participant, 'email')" v-model="participant.email">
+                <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="validate(participant)" v-model="participant.email">
               </div>
               <div class="form-group">
                 <select class="form-control" v-model="participant.exception" v-bind:disabled="participants.length <= 1">
@@ -78,7 +78,7 @@
               <div class="radio">
                 <label>
                   <input type="radio" name="secret" v-model="secret" value="1">
-                  Hide results and email individual participants
+                  Keep results hidden
                 </label>
               </div>
             </div>

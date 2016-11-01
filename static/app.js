@@ -80,6 +80,7 @@ var app = new Vue({
       this.participants.splice(i, 1);
     },
     assign: function(e) {
+        app.email_sent = false;
       
         // remove blank entries
         this.participants = _.filter(this.participants, function(p) {return p.name || p.email});
@@ -121,8 +122,9 @@ var app = new Vue({
       });
       return valid;
     },
-    validate: function() {
-      _.forEach(this.participants.slice(), function(participant, index) {
+    validate: function(participant) {
+      var participants = participant ? [participant] : this.participants;
+      _.forEach(participants.slice(), function(participant, index) {
         if (!participant.name.length) {
           participant.errors.push('name');
         } else {
@@ -139,11 +141,6 @@ var app = new Vue({
         }
       });
       return this.is_valid();
-    },
-    clear_errors: function(participant, field) {
-      participant.errors = _.filter(participant.errors, function(e) {
-        return e != field;
-      });
     },
     send_emails: function() {
       var app = this;
