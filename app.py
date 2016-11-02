@@ -13,17 +13,24 @@ def download_file(filename):
 def index():
     return render_template('index.html')
     
-@app.route('/send-emails')
+@app.route('/send-emails', methods=['POST'])
 def send_emails():
+    try:
+        data = request.get_json()
+    except:
+        return jsonify({'success': False})
+    assignments = data.get('assignments', []) or []
+    print assignments
     # TODO
-    return jsonify({'success': True})
-    response = requests.post(
-        os.environ.get('MAILGUN_URL', "https://api.mailgun.net/v3/sandbox0aa36d7567cf488592e40d28b7984119.mailgun.org/messages"),
-        auth=("api", os.environ.get('MAILGUN_KEY', 'key-e8ad4beedc7ee6c094f424c70548733f')),
-        data={"from": os.environ.get('MAILGUN_FROM', "Secret Santa Mailer <secret-santa@secret-santa-flackdl.c9users.io>"),
-              "to": ["flackattack@gmail.com"],
-              "subject": "Hello",
-              "text": "Testing some Mailgun awesomness!"})
+    #return jsonify({'success': True})
+    for assignment in assignments:
+        requests.post(
+            "https://api.mailgun.net/v3/%s/messages" % os.environ['MAILGUN_DOMAIN'],
+            auth=("api", os.environ['MAILGUN_API_KEY']),
+            data={"from": os.environ.get('MAILGUN_FROM', "Secret Santa Mailer <secret-santa@secret-santa-flackdl.c9users.io>"),
+                  "to": [assignment.buyer.email],
+                  "subject": "Ssshhh... this is your Secret Santa recipient",
+                  "text": "Your Secret Santa recipient is %s (%s)" % (assignment.recipient.name, assignment.recipient.email)})
     return jsonify({'success': True})
               
 

@@ -143,7 +143,7 @@ var app = new Vue({
     },
     send_emails: function() {
       var app = this;
-      this.$http.get('/send-emails').then((response) => {
+      this.$http.post('/send-emails', {'assignments': this.assigned}, {'headers': {'content-type': 'application/json'}}).then((response) => {
         console.log('success', response);
         app.email_sent = true;
       }, (response) => {
