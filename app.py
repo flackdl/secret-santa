@@ -2,6 +2,9 @@ import os
 import requests
 from flask import Flask, request, render_template, render_template_string, Response, session, url_for, redirect, jsonify, send_from_directory
 
+MAILGUN_DOMAIN_SANDBOX = 'sandbox0aa36d7567cf488592e40d28b7984119.mailgun.org'
+MAILGUN_API_KEY_SANDBOX = 'key-e8ad4beedc7ee6c094f424c70548733f'
+
 app = Flask(__name__, static_url_path='/static')
 
 @app.route('/<path:filename>')
@@ -20,17 +23,14 @@ def send_emails():
     except:
         return jsonify({'success': False})
     assignments = data.get('assignments', []) or []
-    print assignments
-    # TODO
-    #return jsonify({'success': True})
     for assignment in assignments:
         requests.post(
-            "https://api.mailgun.net/v3/%s/messages" % os.environ['MAILGUN_DOMAIN'],
-            auth=("api", os.environ['MAILGUN_API_KEY']),
+            "https://api.mailgun.net/v3/%s/messages" % os.environ.get('MAILGUN_DOMAIN', MAILGUN_DOMAIN_SANDBOX),
+            auth=("api", os.environ.get('MAILGUN_API_KEY', MAILGUN_API_KEY_SANDBOX)),
             data={"from": os.environ.get('MAILGUN_FROM', "Secret Santa Mailer <secret-santa@secret-santa-flackdl.c9users.io>"),
-                  "to": [assignment.buyer.email],
+                  "to": [assignment['buyer']['email']],
                   "subject": "Ssshhh... this is your Secret Santa recipient",
-                  "text": "Your Secret Santa recipient is %s (%s)" % (assignment.recipient.name, assignment.recipient.email)})
+                  "text": "Your Secret Santa recipient is %s (%s)" % (assignment['recipient']['name'], assignment['recipient']['email'])})
     return jsonify({'success': True})
               
 
