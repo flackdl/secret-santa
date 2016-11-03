@@ -1,5 +1,6 @@
 import os
 import requests
+import logging
 from flask import Flask, request, render_template, render_template_string, Response, session, url_for, redirect, jsonify, send_from_directory
 
 MAILGUN_DOMAIN_SANDBOX = 'sandbox0aa36d7567cf488592e40d28b7984119.mailgun.org'
@@ -21,8 +22,10 @@ def send_emails():
     try:
         data = request.get_json()
     except:
-        return jsonify({'success': False})
+        return jsonify({'success': False}), 500
     assignments = data.get('assignments', []) or []
+    logging.info(assignments)
+    logging.info(os.environ)
     for assignment in assignments:
         requests.post(
             "https://api.mailgun.net/v3/%s/messages" % os.environ.get('MAILGUN_DOMAIN', MAILGUN_DOMAIN_SANDBOX),
