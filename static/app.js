@@ -44,7 +44,7 @@ var assign = function(participants) {
         return false; 
       }
       // exception
-      if (participant.exception && participant.exception.email == p.email) {
+      if (participant.exception == p.email) {
         return false;
       }
       return true;
@@ -131,7 +131,7 @@ var app = new Vue({
     validate: function(participant) {
       var participants = participant ? [participant] : this.participants;
       _.forEach(participants.slice(), function(participant, index) {
-        if (!participant.name.length) {
+        if (!participant.name || !participant.name.length) {
           participant.errors.push('name');
         } else {
           participant.errors = _.filter(participant.errors, function(e) {
