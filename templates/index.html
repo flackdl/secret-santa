@@ -71,44 +71,48 @@
             <div class="form-control">
               <div class="radio">
                 <label>
-                  <input type="radio" name="secret" v-model="secret" value="0">
+                  <input type="radio" name="secret" v-model="secret" value="">
                   Display results
                 </label>
               </div>
               <div class="radio">
                 <label>
-                  <input type="radio" name="secret" v-model="secret" value="1">
+                  <input type="radio" name="secret" v-model="secret" value="true">
                   Keep results hidden
                 </label>
               </div>
             </div>
+          
+            <!-- results -->
+            <div id="results" class="row marketing">
+              <!-- error -->
+              <div class="col-lg-12" v-if="error">
+                <div class="alert alert-block alert-danger"><strong>Failed assigning! </strong> {$ error $}</div>
+              </div>
+              <!-- success -->
+              <div class="col-lg-12" v-if="assigned.length">
+                <div class="alert alert-block alert-success"><strong>Successfully matched everyone!</strong></div>
+                <h2>Results</h2>
+                <div v-for="participant in assigned">
+                  {$ participant.buyer.name $} buys a gift for
+                  <span v-if="secret == 'true'">[secret]</span>
+                  <span v-if="secret != 'true'">{$ participant.recipient.name $}</span>
+                </div> 
+                <div>
+                  <button class="btn btn-primary btn-lg" v-if="!email_sent" v-on:click="send_emails()"><span class="glyphicon glyphicon-envelope"></span> Email Participants</button>
+                  <button class="btn btn-success btn-lg disabled" disabled v-if="email_sent"><span class="glyphicon glyphicon-ok"></span> Emailed</button>
+                </div>
+              </div>
+            </div>
+            
             <div>
-              <button class="btn btn-success btn-lg btn-block assign" v-bind:class="{disabled: !is_valid() }" v-bind:disabled="!is_valid()">
-                <span class="glyphicon glyphicon-random"></span> Assign
+              <button class="btn btn-lg btn-block assign" v-bind:class="{disabled: !is_valid(), 'btn-success': !assigned.length, 'btn-warning': assigned.length}" v-bind:disabled="!is_valid()">
+                <span class="glyphicon glyphicon-random"></span>
+                <span v-if="!assigned.length">Assign</span>
+                <span v-if="assigned.length">Reassign</span>
               </button>
             </div>
           </form>
-        </div>
-      </div>
-      
-      <div id="results" class="row marketing">
-        <!-- error -->
-        <div class="col-lg-12" v-if="error">
-          <div class="alert alert-block alert-danger"><strong>Failed assigning! </strong> {$ error $}</div>
-        </div>
-        <!-- success -->
-        <div class="col-lg-12" v-if="assigned.length">
-          <div class="alert alert-block alert-info"><strong>Successfully matched everyone!</strong></div>
-          <h2>Results</h2>
-          <div v-for="participant in assigned">
-            {$ participant.buyer.name $} buys a gift for
-            <span v-if="secret">[secret]</span>
-            <span v-if="!secret">{$ participant.recipient.name $}</span>
-          </div> 
-          <div>
-            <button class="btn btn-primary btn-lg" v-if="!email_sent" v-on:click="send_emails()">Email Participants</button>
-            <button class="btn btn-success btn-lg disabled" disabled v-if="email_sent"><span class="glyphicon glyphicon-ok"></span> Emailed</button>
-          </div>
         </div>
       </div>
 

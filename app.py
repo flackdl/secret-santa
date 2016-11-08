@@ -1,4 +1,5 @@
 import os
+import logging
 import requests
 from flask import Flask, request, render_template, render_template_string, Response, session, url_for, redirect, jsonify, send_from_directory
 import sendgrid
@@ -27,6 +28,8 @@ def send_emails():
         
     assignments = data.get('assignments', []) or []
     
+    logging.info(assignments)
+    
     for assignment in assignments:
         
         sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
@@ -37,9 +40,12 @@ def send_emails():
         mail = sg_mail.Mail(from_email, subject, to_email, content)
         response = sg.client.mail.send.post(request_body=mail.get())
         
+        logging.info('%s, %s' % (assignment['buyer']['email'], response.status_code))
+        
         # failure
-        if response.status_code < 200:
-            return jsonify({'success': False})
+        if response.status_code < 200 or response.status_code >= 300:
+            logging.info('failed')
+            return jsonify({'success': False}), 500
             
     return jsonify({'success': True})
               

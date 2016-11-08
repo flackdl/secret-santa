@@ -75,9 +75,11 @@ var app = new Vue({
   methods: {
     addParticipant: function() {
       this.participants.push(new Person());
+      this.assigned = [];
     },
     removeParticipant: function(i) {
       this.participants.splice(i, 1);
+      this.assigned = [];
     },
     assign: function(e) {
         app.email_sent = false;
