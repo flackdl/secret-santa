@@ -1,6 +1,8 @@
 import os
 import requests
 from flask import Flask, request, render_template, render_template_string, Response, session, url_for, redirect, jsonify, send_from_directory
+import sendgrid
+from sendgrid.helpers import mail as sg_mail
 
 MAILGUN_DOMAIN_SANDBOX = 'sandbox0aa36d7567cf488592e40d28b7984119.mailgun.org'
 MAILGUN_API_KEY_SANDBOX = 'key-e8ad4beedc7ee6c094f424c70548733f'
@@ -22,17 +24,23 @@ def send_emails():
         data = request.get_json()
     except:
         return jsonify({'success': False}), 500
+        
     assignments = data.get('assignments', []) or []
-    print assignments
-    print os.environ
+    
     for assignment in assignments:
-        requests.post(
-            "https://api.mailgun.net/v3/%s/messages" % os.environ.get('MAILGUN_DOMAIN', MAILGUN_DOMAIN_SANDBOX),
-            auth=("api", os.environ.get('MAILGUN_API_KEY', MAILGUN_API_KEY_SANDBOX)),
-            data={"from": os.environ.get('MAILGUN_FROM', "Secret Santa Mailer <secret-santa@secret-santa-flackdl.c9users.io>"),
-                  "to": [assignment['buyer']['email']],
-                  "subject": "Ssshhh... this is your Secret Santa recipient",
-                  "text": "Your Secret Santa recipient is %s (%s)" % (assignment['recipient']['name'], assignment['recipient']['email'])})
+        
+        sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+        from_email = sg_mail.Email("secret-santa@vecinos.xyz")
+        subject = "Ssshh...this is your Secret Santa recipient"
+        to_email = sg_mail.Email(assignment['buyer']['email'])
+        content = sg_mail.Content("text/plain", "Your Secret Santa recipient is %s!" % assignment['recipient']['name'])
+        mail = sg_mail.Mail(from_email, subject, to_email, content)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        
+        # failure
+        if response.status_code < 200:
+            return jsonify({'success': False})
+            
     return jsonify({'success': True})
               
 
