@@ -17,13 +17,13 @@ var init_participants = function() {
   // start off with a list of blank participants
   var participants = [];
   _.forEach(_.range(0, 4), function(v, i) {
-      participants.push(new Person('Name ' + i, i + '@email.com'));
+      participants.push(new Person());
   });
   
   return participants;
 }
 
-function validateEmail(email) {
+var validateEmail = function (email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 }
@@ -82,10 +82,15 @@ var app = new Vue({
       this.assigned = [];
     },
     assign: function(e) {
-        app.email_sent = false;
+        this.email_sent = false;
+        this.error = null;
       
         // remove blank entries
         this.participants = _.filter(this.participants, function(p) {return p.name || p.email});
+        if (!this.participants.length) {
+         this.error = 'There are no valid participants to assign'; 
+         return;
+        }
         
         if (!this.validate()) {
           return;
