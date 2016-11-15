@@ -5,9 +5,6 @@ from flask import Flask, request, render_template, render_template_string, Respo
 import sendgrid
 from sendgrid.helpers import mail as sg_mail
 
-MAILGUN_DOMAIN_SANDBOX = 'sandbox0aa36d7567cf488592e40d28b7984119.mailgun.org'
-MAILGUN_API_KEY_SANDBOX = 'key-e8ad4beedc7ee6c094f424c70548733f'
-
 app = Flask(__name__, static_url_path='/static')
 
 @app.route('/<path:filename>')
