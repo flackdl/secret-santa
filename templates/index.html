@@ -51,9 +51,9 @@
 
       <div class="row marketing" id="participants">
         <div class="col-lg-12">
-          <form class="form-inline" method="post" v-on:submit.prevent="assign">
+          <form method="post" v-on:submit.prevent="assign">
             <h2>Participants <a v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</a></h2>
-            <div v-for="(participant, index) in participants">
+            <div v-for="(participant, index) in participants" class="form-inline">
               <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
                 <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index">
               </div>
@@ -73,7 +73,7 @@
             <div class="form-control">
               <div class="radio">
                 <label>
-                  <input type="radio" name="secret" v-model="secret" value="">
+                  <input type="radio" name="secret" v-model="secret" value="false">
                   Display results
                 </label>
               </div>
