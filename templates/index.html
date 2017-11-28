@@ -72,7 +72,7 @@
               <div class="col-md-10">
                 <div class="form-group">
                   <label>Exclusions</label>
-                  <v-select multiple :searchable="false" :options.sync="exceptions_options(participant)"></v-select>
+                  <v-select multiple :searchable="false" :value.sync="participant.exceptions" :options="exceptions_options(participant)"></v-select>
                   <!--
                   <select class="form-control" v-model="participant.exception" v-bind:disabled="participants.length <= 1">
                     <option value="">-- can match with anyone --</option>

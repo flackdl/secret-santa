@@ -1,7 +1,7 @@
 var Person = function(name, email) {
     this.name = name;
     this.email = email;
-    this.exception = '';
+    this.exceptions = [];
     this.errors = [];
 }
 Person.prototype.has_error = function (name) {
@@ -44,7 +44,11 @@ var assign = function(participants) {
         return false; 
       }
       // exception
-      if (participant.exception == p.email) {
+      var exists = _.find(participant.exceptions, function(exception) {
+        // exceptions are in the select "options" format so check "value"
+        return exception.value === p.email;
+      });
+      if (exists) {
         return false;
       }
       return true;
@@ -73,7 +77,7 @@ var app = new Vue({
     error: null,
     secret: false,
     email_sent: false,
-    //exceptions_options: {},
+    participant_exceptions: [],
   },
   methods: {
     addParticipant: function() {
@@ -112,7 +116,7 @@ var app = new Vue({
             }
         }
         if (!this.assigned.length) {
-          this.error = 'There are too many exceptions to assign correctly';
+          this.error = 'There are too many exclusions to assign correctly';
         }
     },
     exceptions: function (participant) {
