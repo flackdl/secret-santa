@@ -1,7 +1,7 @@
 var Person = function(name, email) {
     this.name = name;
     this.email = email;
-    this.exception = '';
+    this.exceptions = [];
     this.errors = [];
 }
 Person.prototype.has_error = function (name) {
@@ -44,7 +44,11 @@ var assign = function(participants) {
         return false; 
       }
       // exception
-      if (participant.exception == p.email) {
+      var exists = _.find(participant.exceptions, function(exception) {
+        // exceptions are in the select "options" format so check "value"
+        return exception.value === p.email;
+      });
+      if (exists) {
         return false;
       }
       return true;
@@ -62,6 +66,8 @@ var assign = function(participants) {
   return assigned;
 };
 
+Vue.component('v-select', VueSelect.VueSelect);
+
 var app = new Vue({
   el: '#secret-santa',
   delimiters: ['{$', '$}'],
@@ -71,6 +77,7 @@ var app = new Vue({
     error: null,
     secret: false,
     email_sent: false,
+    participant_exceptions: [],
   },
   methods: {
     addParticipant: function() {
@@ -109,7 +116,7 @@ var app = new Vue({
             }
         }
         if (!this.assigned.length) {
-          this.error = 'There are too many exceptions to assign correctly';
+          this.error = 'There are too many exclusions to assign correctly';
         }
     },
     exceptions: function (participant) {
@@ -117,6 +124,18 @@ var app = new Vue({
       var exceptions = _.filter(this.participants, function(p) {return p.email != participant.email});
       exceptions.unshift();
       return exceptions;
+    },
+    exceptions_options: function (participant) {
+      if (!participant.email) {
+        return [];
+      }
+      var options = _.map(_.filter(this.exceptions(participant), function(p) { return p.email; }), function(exception) {
+        return {
+          label: exception.name,
+          value: exception.email,
+        };
+      });
+      return options;
     },
     is_valid: function () {
       var valid = true;
@@ -158,4 +177,4 @@ var app = new Vue({
       });
     }
   },
-}) 
+});

@@ -11,7 +11,7 @@
 
     <title>Secret Santa - Give the Gift of Gifts</title>
 
-    <link rel="stylesheet" href="https://bootswatch.com/4/minty/bootstrap.min.css">
+    <link rel="stylesheet" href="https://bootswatch.com/4/united/bootstrap.min.css">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -51,23 +51,35 @@
 
       <div class="row marketing" id="participants">
         <div class="col-lg-12">
-          <form method="post" v-on:submit.prevent="assign">
-            <h2>Participants <a v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</a></h2>
-            <div v-for="(participant, index) in participants" class="form-inline">
-              <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
-                <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index">
+          <h2>Participants <button type="button" v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</button></h2>
+          <form v-on:submit.prevent="assign">
+            <div v-for="(participant, index) in participants" class="row">
+              <div class="col-md-5">
+                <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
+                  <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index">
+                </div>
               </div>
-              <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('email') }">
-                <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="validate(participant)" v-model="participant.email">
+              <div class="col-md-5">
+                <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('email') }">
+                  <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="validate(participant)" v-model="participant.email">
+                </div>
               </div>
-              <div class="form-group">
-                <select class="form-control" v-model="participant.exception" v-bind:disabled="participants.length <= 1">
-                  <option value="">-- can match with anyone --</option>
-                  <option v-for="exception in exceptions(participant)" v-bind:value="exception.email">Don't match with {$ exception.name $}</option>
-                </select>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <a class="btn btn-link" v-on:click="removeParticipant(index)">x</a>
+                </div>
               </div>
-              <div class="form-group">
-                <a class="btn btn-link" v-on:click="removeParticipant(index)">x</a>
+              <div class="col-md-10">
+                <div class="form-group">
+                  <label>Exclusions</label>
+                  <v-select multiple :searchable="false" :value.sync="participant.exceptions" :options="exceptions_options(participant)"></v-select>
+                  <!--
+                  <select class="form-control" v-model="participant.exception" v-bind:disabled="participants.length <= 1">
+                    <option value="">-- can match with anyone --</option>
+                    <option v-for="exception in exceptions(participant)" v-bind:value="exception.email">Don't match with {$ exception.name $}</option>
+                  </select>
+                  -->
+                </div>
               </div>
             </div>
             <div class="form-control">
@@ -124,11 +136,11 @@
 
     </div> <!-- /container -->
     
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.4/lodash.min.js"></script>
    <script src="https://unpkg.com/vue/dist/vue.js"></script>
    <script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.4/lodash.min.js"></script>
+   <script src="https://unpkg.com/vue-select@latest"></script>
    <script src="/app.js"></script>
-
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/ie10-viewport-bug-workaround.js"></script>
   </body>
