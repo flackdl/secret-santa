@@ -62,6 +62,8 @@ var assign = function(participants) {
   return assigned;
 };
 
+Vue.component('v-select', VueSelect.VueSelect);
+
 var app = new Vue({
   el: '#secret-santa',
   delimiters: ['{$', '$}'],
@@ -71,6 +73,7 @@ var app = new Vue({
     error: null,
     secret: false,
     email_sent: false,
+    //exceptions_options: {},
   },
   methods: {
     addParticipant: function() {
@@ -118,6 +121,18 @@ var app = new Vue({
       exceptions.unshift();
       return exceptions;
     },
+    exceptions_options: function (participant) {
+      if (!participant.email) {
+        return [];
+      }
+      var options = _.map(_.filter(this.exceptions(participant), function(p) { return p.email; }), function(exception) {
+        return {
+          label: exception.name,
+          value: exception.email,
+        };
+      });
+      return options;
+    },
     is_valid: function () {
       var valid = true;
       _.forEach(this.participants.slice(), function(participant, index) {
@@ -158,4 +173,4 @@ var app = new Vue({
       });
     }
   },
-}) 
+});
