@@ -31,7 +31,7 @@ def send_emails():
         
         sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
         from_email = sg_mail.Email("secret-santa@vecinos.xyz")
-        subject = "Ssshh...{}, this is your Secret Santa recipient".format(assignment['buyer']['name'])
+        subject = "Ssshh...{}, this is your Secret Santa recipient (REAL)".format(assignment['buyer']['name'])
         to_email = sg_mail.Email(assignment['buyer']['email'])
         content = sg_mail.Content("text/plain", "Your Secret Santa recipient is %s!" % assignment['recipient']['name'])
         mail = sg_mail.Mail(from_email, subject, to_email, content)
