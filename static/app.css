@@ -81,3 +81,6 @@ body {
 .btn.assign {
   margin: 20px 0;
 }
+.display-results {
+  height: 100%;
+}

@@ -79,18 +79,23 @@
             </div>
             <div class="col-xs-10"><hr></div>
           </div>
-          <div class="form-control">
-            <div class="radio">
-              <label>
-                <input type="radio" name="secret" v-model="secret" value="false">
-                Display results
-              </label>
-            </div>
-            <div class="radio">
-              <label>
-                <input type="radio" name="secret" v-model="secret" value="true">
-                Keep results hidden
-              </label>
+          
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="form-control display-results">
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="secret" v-model="secret" value="false">
+                    Display results
+                  </label>
+                </div>
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="secret" v-model="secret" value="true">
+                    Keep results hidden
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         
