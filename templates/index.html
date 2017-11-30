@@ -11,7 +11,8 @@
 
     <title>Secret Santa - Give the Gift of Gifts</title>
 
-    <link rel="stylesheet" href="https://bootswatch.com/4/united/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="https://bootswatch.com/4/united/bootstrap.min.css">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -51,80 +52,78 @@
         <p><a class="btn btn-lg btn-info" href="#participants" role="button">Get Started</a></p>
       </div>
 
-      <div class="row marketing" id="participants">
-        <div class="col-lg-12">
-          <h2>Participants <button type="button" v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</button></h2>
-          <form v-on:submit.prevent="assign">
-            <div v-for="(participant, index) in participants" class="row">
-              <hr>
-              <div class="col-xs-5 col-lg-5">
-                <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
-                  <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index">
-                </div>
-              </div>
-              <div class="col-xs-6 col-lg-5">
-                <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('email') }">
-                  <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="validate(participant)" v-model="participant.email">
-                </div>
-              </div>
-              <div class="col-xs-1 col-lg-2">
-                <div class="form-group">
-                  <a class="btn btn-link" v-on:click="removeParticipant(index)">x</a>
-                </div>
-              </div>
-              <div class="col-lg-10">
-                <div class="form-group">
-                  <label>Exclusions</label>
-                  <v-select multiple :searchable="false" :value.sync="participant.exceptions" :options="exceptions_options(participant)"></v-select>
-                </div>
+      <div class="marketing" id="participants">
+        <h2>Participants <button type="button" v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</button></h2>
+        <form v-on:submit.prevent="assign">
+          <div v-for="(participant, index) in participants" class="row">
+            <div class="col-xs-5">
+              <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
+                <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index">
               </div>
             </div>
-            <div class="form-control">
-              <div class="radio">
-                <label>
-                  <input type="radio" name="secret" v-model="secret" value="false">
-                  Display results
-                </label>
-              </div>
-              <div class="radio">
-                <label>
-                  <input type="radio" name="secret" v-model="secret" value="true">
-                  Keep results hidden
-                </label>
+            <div class="col-xs-5">
+              <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('email') }">
+                <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="validate(participant)" v-model="participant.email">
               </div>
             </div>
+            <div class="col-xs-1">
+              <div class="form-group">
+                <a class="btn btn-link" v-on:click="removeParticipant(index)">x</a>
+              </div>
+            </div>
+            <div class="col-xs-10">
+              <div class="form-group">
+                <label>Exclusions</label>
+                <v-select multiple :searchable="false" :value.sync="participant.exceptions" :options="exceptions_options(participant)"></v-select>
+              </div>
+            </div>
+            <div class="col-xs-10"><hr></div>
+          </div>
+          <div class="form-control">
+            <div class="radio">
+              <label>
+                <input type="radio" name="secret" v-model="secret" value="false">
+                Display results
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="secret" v-model="secret" value="true">
+                Keep results hidden
+              </label>
+            </div>
+          </div>
+        
+          <!-- results -->
+          <div id="results" class="row marketing">
+            <!-- error -->
+            <div class="col-lg-12" v-if="error">
+              <div class="alert alert-block alert-danger"><strong>Failed assigning! </strong> {$ error $}</div>
+            </div>
+            <!-- success -->
+            <div class="col-lg-12" v-if="assigned.length">
+              <div class="alert alert-block alert-success"><strong>Successfully matched everyone!</strong></div>
+              <h2>Results</h2>
+              <div v-for="participant in assigned">
+                {$ participant.buyer.name $} buys a gift for
+                <span v-if="secret == 'true'">[secret]</span>
+                <span v-if="secret != 'true'">{$ participant.recipient.name $}</span>
+              </div> 
+              <div>
+                <button class="btn btn-primary btn-lg" v-if="!email_sent" v-on:click="send_emails()"><span class="glyphicon glyphicon-envelope"></span> Email Participants</button>
+                <button class="btn btn-success btn-lg disabled" disabled v-if="email_sent"><span class="glyphicon glyphicon-ok"></span> Emailed</button>
+              </div>
+            </div>
+          </div>
           
-            <!-- results -->
-            <div id="results" class="row marketing">
-              <!-- error -->
-              <div class="col-lg-12" v-if="error">
-                <div class="alert alert-block alert-danger"><strong>Failed assigning! </strong> {$ error $}</div>
-              </div>
-              <!-- success -->
-              <div class="col-lg-12" v-if="assigned.length">
-                <div class="alert alert-block alert-success"><strong>Successfully matched everyone!</strong></div>
-                <h2>Results</h2>
-                <div v-for="participant in assigned">
-                  {$ participant.buyer.name $} buys a gift for
-                  <span v-if="secret == 'true'">[secret]</span>
-                  <span v-if="secret != 'true'">{$ participant.recipient.name $}</span>
-                </div> 
-                <div>
-                  <button class="btn btn-primary btn-lg" v-if="!email_sent" v-on:click="send_emails()"><span class="glyphicon glyphicon-envelope"></span> Email Participants</button>
-                  <button class="btn btn-success btn-lg disabled" disabled v-if="email_sent"><span class="glyphicon glyphicon-ok"></span> Emailed</button>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <button class="btn btn-lg btn-block assign" v-bind:class="{disabled: !is_valid(), 'btn-success': !assigned.length, 'btn-warning': assigned.length}" v-bind:disabled="!is_valid()">
-                <span class="glyphicon glyphicon-random"></span>
-                <span v-if="!assigned.length">Assign</span>
-                <span v-if="assigned.length">Reassign</span>
-              </button>
-            </div>
-          </form>
-        </div>
+          <div>
+            <button class="btn btn-lg btn-block assign" v-bind:class="{disabled: !is_valid(), 'btn-success': !assigned.length, 'btn-warning': assigned.length}" v-bind:disabled="!is_valid()">
+              <span class="glyphicon glyphicon-random"></span>
+              <span v-if="!assigned.length">Assign</span>
+              <span v-if="assigned.length">Reassign</span>
+            </button>
+          </div>
+        </form>
       </div>
 
       <footer class="footer">
