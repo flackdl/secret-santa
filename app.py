@@ -1,11 +1,11 @@
 import os
-import logging
-import requests
-from flask import Flask, request, render_template, render_template_string, Response, session, url_for, redirect, jsonify, send_from_directory
+from flask import Flask, request, render_template, jsonify, send_from_directory
 import sendgrid
 from sendgrid.helpers import mail as sg_mail
 
+
 app = Flask(__name__, static_url_path='/static')
+
 
 @app.route('/<path:filename>')
 def download_file(filename):
@@ -15,6 +15,7 @@ def download_file(filename):
 @app.route('/')
 def index():
     return render_template('index.html')
+
     
 @app.route('/send-emails', methods=['POST'])
 def send_emails():
@@ -25,10 +26,12 @@ def send_emails():
         
     assignments = data.get('assignments', []) or []
     
-    logging.info(assignments)
+    app.logger.info(assignments)
     
     for assignment in assignments:
-        
+
+        app.logger.info('%s buys for %s' % (assignment['buyer']['email'], assignment['recipient']['name']))
+
         sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
         from_email = sg_mail.Email("secret-santa@vecinos.xyz")
         subject = "Ssshh...{}, this is your Secret Santa recipient".format(assignment['buyer']['name'])
@@ -36,12 +39,12 @@ def send_emails():
         content = sg_mail.Content("text/plain", "Your Secret Santa recipient is %s!" % assignment['recipient']['name'])
         mail = sg_mail.Mail(from_email, subject, to_email, content)
         response = sg.client.mail.send.post(request_body=mail.get())
-        
-        logging.info('%s, %s' % (assignment['buyer']['email'], response.status_code))
+
+        app.logger.info('%s, %s' % (assignment['buyer']['email'], response.status_code))
         
         # failure
         if response.status_code < 200 or response.status_code >= 300:
-            logging.info('failed')
+            app.logger.info('failed')
             return jsonify({'success': False}), 500
             
     return jsonify({'success': True})
