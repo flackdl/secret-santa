@@ -54,16 +54,16 @@
 
       <div class="marketing" id="participants">
         <h2>Participants <button type="button" v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</button></h2>
-        <form v-on:submit.prevent="assign" autocomplete="off">
+        <form v-on:submit.prevent="assign" autocomplete="false">
           <div v-for="(participant, index) in participants" class="row">
             <div class="col-xs-5">
               <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
-                <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index" autocomplete="off">
+                <input type="text" name="name" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index" autocomplete="false">
               </div>
             </div>
             <div class="col-xs-5">
               <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('email') }">
-                <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="validate(participant)" v-model="participant.email" autocomplete="off">
+                <input type="email" v-bind:name="'email' + index" class="form-control" placeholder="Email" v-on:keyup="validate(participant)" v-model="participant.email" autocomplete="false">
               </div>
             </div>
             <div class="col-xs-1">
