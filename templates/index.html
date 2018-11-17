@@ -58,7 +58,7 @@
           <div v-for="(participant, index) in participants" class="row">
             <div class="col-xs-5">
               <div class="form-group" v-bind:class="{ 'has-error': participant.has_error('name') }">
-                <input type="text" class="form-control" placeholder="Name" v-on:keyup="validate(participant)" v-model="participant.name" v-bind:name="'name' + index" autocomplete="false">
+                <input type="text" class="form-control" placeholder="Name" v-model="participant.name" v-bind:name="'name' + index" autocomplete="false">
               </div>
             </div>
             <div class="col-xs-5">
