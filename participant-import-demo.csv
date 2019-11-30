@@ -1,0 +1,6 @@
+name, email, exclusions
+bob, bob@home.net
+jerry, jerry@aol.com
+mom, mom@hotmail.org
+dad, dad@dad.org
+kid, kid@kid.com,mom@hotmail.org|dad@dad.org

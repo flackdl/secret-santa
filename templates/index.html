@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="/static/favico.png">
+    <link rel="icon" href="/favico.png">
 
     <title>Secret Santa - Give the Gift of Gifts</title>
 
@@ -36,11 +36,6 @@
       <div class="header clearfix">
         <nav>
           <ul class="nav nav-pills pull-right">
-            <!--
-            <li role="presentation" class="active"><a href="#">Home</a></li>
-            <li role="presentation"><a href="#">About</a></li>
-            <li role="presentation"><a href="#">Contact</a></li>
-            -->
           </ul>
         </nav>
         <h3 class="text-muted">Secret Santa</h3>
@@ -53,7 +48,10 @@
       </div>
 
       <div class="marketing" id="participants">
-        <h2>Participants <button type="button" v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</button></h2>
+          <h2>Participants
+              <button type="button" v-on:click="addParticipant()" class="btn btn-default btn-sm">Add</button>
+              <a class="btn btn-link" href="#import">Import CSV</a>
+          </h2>
         <form v-on:submit.prevent="assign" autocomplete="false">
           <div v-for="(participant, index) in participants" class="row">
             <div class="col-xs-5">
@@ -114,13 +112,13 @@
                 <span v-if="secret == 'true'">[secret]</span>
                 <span v-if="secret != 'true'">{$ participant.recipient.name $}</span>
               </div> 
-              <div>
+              <div style="margin-top: 10px;">
                 <button class="btn btn-primary btn-lg" v-if="!email_sent" v-on:click="send_emails()"><span class="glyphicon glyphicon-envelope"></span> Email Participants</button>
                 <button class="btn btn-success btn-lg disabled" disabled v-if="email_sent"><span class="glyphicon glyphicon-ok"></span> Emailed</button>
               </div>
             </div>
           </div>
-          
+
           <div>
             <button class="btn btn-lg btn-block assign" v-bind:class="{disabled: !is_valid(), 'btn-success': !assigned.length, 'btn-warning': assigned.length}" v-bind:disabled="!is_valid()">
               <span class="glyphicon glyphicon-random"></span>
@@ -130,6 +128,14 @@
           </div>
         </form>
       </div>
+
+        <div class="text-left alert alert-info" id="import">
+            <div class="form-group">
+                <label for="csv">*Optionally Import Participants from CSV</label>
+                <input type="file" id="csv" name="csv" accept="text/csv" v-on:change="importParticipants()">
+                <p><a href="https://github.com/flackdl/secret-santa/blob/master/participant-import-demo.csv"><small>See demo CSV</small></a></p>
+            </div>
+        </div>
 
       <footer class="footer">
         <p><a href="https://github.com/flackdl/secret-santa">made by Danny Flack</a></p>
@@ -142,6 +148,7 @@
    <script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
    <script src="https://unpkg.com/vue-select@2.4.0"></script>
    <script src="/app.js"></script>
+    <script src="/csv.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/ie10-viewport-bug-workaround.js"></script>
   </body>

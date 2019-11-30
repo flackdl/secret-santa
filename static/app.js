@@ -1,57 +1,56 @@
-var Person = function(name, email) {
+let Person = function(name, email) {
     this.name = name;
     this.email = email;
     this.exceptions = [];
+    this.exception_emails = [];  // only used in csv import
     this.errors = [];
-}
+};
 Person.prototype.has_error = function (name) {
   return _.indexOf(this.errors, name) != -1;
-}
+};
 
-var Match = function(buyer, recipient) {
+let Match = function(buyer, recipient) {
     this.buyer = buyer;
     this.recipient = recipient;
-}
+};
 
-var init_participants = function() {
+let init_participants = function() {
   // start off with a list of blank participants
-  var participants = [];
+  let participants = [];
   _.forEach(_.range(0, 4), function(v, i) {
       participants.push(new Person());
   });
   
   return participants;
-}
+};
 
-var validateEmail = function (email) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+let validateEmail = function (email) {
+    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
-}
+};
 
-var assign = function(participants) {
-  var assigned = [];
+let assign = function(participants) {
+  let assigned = [];
   
-  _.forEach(participants.slice(), function(participant, index) {
+  _.forEach(participants.slice(), function(participant) {
     
     // remove self, assigned and exceptions
-    var available_recipients = _.filter(participants, function(p) {
+    let available_recipients = _.filter(participants, function(p) {
       // self
-      if (p.email == participant.email) {
+      if (p.email === participant.email) {
+          console.log('self', participant);
         return false; 
       }
       // assigned
-      if (_.find(assigned, function(a) {return a.recipient.email == p.email})) {
-        return false; 
+      if (_.find(assigned, function(a) {return a.recipient.email === p.email})) {
+          console.log('assigned', participant);
+        return false;
       }
       // exception
-      var exists = _.find(participant.exceptions, function(exception) {
+      return !_.find(participant.exceptions, function(exception) {
         // exceptions are in the select "options" format so check "value"
         return exception.value === p.email;
       });
-      if (exists) {
-        return false;
-      }
-      return true;
     });
     
     // choose a random participant
@@ -68,7 +67,7 @@ var assign = function(participants) {
 
 Vue.component('v-select', VueSelect.VueSelect);
 
-var app = new Vue({
+let app = new Vue({
   el: '#secret-santa',
   delimiters: ['{$', '$}'],
   data: {
@@ -81,8 +80,37 @@ var app = new Vue({
   },
   methods: {
     addParticipant: function() {
+        console.log(this.participants);
       this.participants.push(new Person());
       this.assigned = [];
+    },
+    importParticipants: function() {
+        CSV.fetch({
+                file: document.getElementById('csv').files[0],
+            }
+        ).then((dataset) => {
+            this.participants = [];
+            _.forEach(dataset.records, (row) => {
+                let participant = new Person(row[0], row[1]);
+                if (row.length > 2) {
+                    participant.exception_emails = row[2].split('|');
+                }
+                this.participants.push(participant);
+            });
+            _.forEach(this.participants, (participant) => {
+                _.forEach(participant.exception_emails, (email) => {
+                    const match = _.find(this.participants, (p) => {
+                        return p.email === email;
+                    });
+                    if (match) {
+                        participant.exceptions.push({
+                            label: match.name,
+                            value: match.email,
+                        });
+                    }
+                });
+            });
+        });
     },
     removeParticipant: function(i) {
       this.participants.splice(i, 1);
@@ -107,7 +135,7 @@ var app = new Vue({
         this.assigned = [];
         
         // use a reasonable attempt limit
-        var i = 0;
+        let i = 0;
         while(!this.assigned.length && i++ <= 100) {
           this.assigned = [];
             try {
@@ -121,7 +149,7 @@ var app = new Vue({
     },
     exceptions: function (participant) {
       // remove the participant as an exception option
-      var exceptions = _.filter(this.participants, function(p) {return p.email != participant.email});
+      let exceptions = _.filter(this.participants, function(p) {return p.email !== participant.email});
       exceptions.unshift();
       return exceptions;
     },
@@ -129,16 +157,15 @@ var app = new Vue({
       if (!participant.email) {
         return [];
       }
-      var options = _.map(_.filter(this.exceptions(participant), function(p) { return p.email; }), function(exception) {
+      return _.map(_.filter(this.exceptions(participant), function(p) { return p.email; }), function(exception) {
         return {
           label: exception.name,
           value: exception.email,
         };
       });
-      return options;
     },
     is_valid: function () {
-      var valid = true;
+      let valid = true;
       _.forEach(this.participants.slice(), function(participant, index) {
         if (participant.errors.length) {
           valid = false;
@@ -148,7 +175,7 @@ var app = new Vue({
       return valid;
     },
     validate: function(participant) {
-      var participants = participant ? [participant] : this.participants;
+      let participants = participant ? [participant] : this.participants;
       _.forEach(participants.slice(), function(participant, index) {
         if (!participant.name || !participant.name.length) {
           participant.errors.push('name');
@@ -168,7 +195,7 @@ var app = new Vue({
       return this.is_valid();
     },
     send_emails: function() {
-      var app = this;
+      let app = this;
       this.$http.post('/send-emails', {'assignments': this.assigned}, {'headers': {'content-type': 'application/json'}}).then((response) => {
         console.log('success', response);
         app.email_sent = true;
