@@ -91,9 +91,18 @@ let app = new Vue({
         ).then((dataset) => {
             this.participants = [];
             _.forEach(dataset.records, (row) => {
+                // name and email are required
+                if (!row[0] || !row[1]) {
+                    return;
+                }
                 let participant = new Person(row[0], row[1]);
+                // has exclusions
                 if (row.length > 2) {
-                    participant.exception_emails = row[2].split('|');
+                    for (let i = 2; i < 100; i++) {
+                        if (row[i]) {
+                            participant.exception_emails.push(row[i]);
+                        }
+                    }
                 }
                 this.participants.push(participant);
             });
