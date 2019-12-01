@@ -6,7 +6,7 @@ let Person = function(name, email) {
     this.errors = [];
 };
 Person.prototype.has_error = function (name) {
-    return _.indexOf(this.errors, name) != -1;
+    return _.indexOf(this.errors, name) !== -1;
 };
 
 let Match = function(buyer, recipient) {
@@ -187,14 +187,14 @@ let app = new Vue({
                     participant.errors.push('name');
                 } else {
                     participant.errors = _.filter(participant.errors, function(e) {
-                        return e != 'name';
+                        return e !== 'name';
                     });
                 }
                 if (!validateEmail(participant.email)) {
                     participant.errors.push('email');
                 } else {
                     participant.errors = _.filter(participant.errors, function(e) {
-                        return e != 'email';
+                        return e !== 'email';
                     });
                 }
             });
