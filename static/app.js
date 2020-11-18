@@ -74,6 +74,7 @@ let app = new Vue({
         error: null,
         secret: false,
         email_sent: false,
+        email_sending: false,
         participant_exceptions: [],
     },
     methods: {
@@ -83,9 +84,8 @@ let app = new Vue({
         },
         importParticipants: function() {
             CSV.fetch({
-                    file: document.getElementById('csv').files[0],
-                }
-            ).then((dataset) => {
+                file: document.getElementById('csv').files[0],
+            }).then((dataset) => {
                 this.participants = [];
                 _.forEach(dataset.records, (row) => {
                     // name and email are required
@@ -116,6 +116,7 @@ let app = new Vue({
                         }
                     });
                 });
+                this.$toastr('success', 'Successfully imported participants');
             });
         },
         removeParticipant: function(i) {
@@ -201,12 +202,16 @@ let app = new Vue({
             return this.is_valid();
         },
         send_emails: function() {
-            let app = this;
+            this.email_sending = true;
             this.$http.post('/send-emails', {'assignments': this.assigned}, {'headers': {'content-type': 'application/json'}}).then((response) => {
                 console.log('success', response);
-                app.email_sent = true;
+                this.email_sent = true;
+                this.email_sending = false;
+                this.$toastr('success', 'Successfully emailed participants');
             }, (response) => {
                 console.log('failure', response);
+                this.email_sending = false;
+                this.$toastr('error', 'An error occurred emailing participants');
             });
         }
     },
