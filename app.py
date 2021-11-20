@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, render_template, jsonify, send_from_directory
 import sendgrid
-from sendgrid.helpers import mail as sg_mail
+from sendgrid.helpers.mail import Email, To, Content, Mail
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -32,12 +32,12 @@ def send_emails():
 
         app.logger.info('%s buys for %s' % (assignment['buyer']['email'], assignment['recipient']['name']))
 
-        sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
-        from_email = sg_mail.Email("secret-santa@eerieemu.com")
+        sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        from_email = Email("secret-santa@eerieemu.com")
         subject = "Ssshh...{}, this is your Secret Santa recipient".format(assignment['buyer']['name'])
-        to_email = sg_mail.Email(assignment['buyer']['email'])
-        content = sg_mail.Content("text/plain", "Your Secret Santa recipient is %s!" % assignment['recipient']['name'])
-        mail = sg_mail.Mail(from_email, subject, to_email, content)
+        to_email = To(assignment['buyer']['email'])
+        content = Content("text/plain", "Your Secret Santa recipient is %s!" % assignment['recipient']['name'])
+        mail = Mail(from_email, to_email, subject, content)
         response = sg.client.mail.send.post(request_body=mail.get())
 
         app.logger.info('%s, %s' % (assignment['buyer']['email'], response.status_code))
