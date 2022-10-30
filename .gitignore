@@ -103,8 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# cwwed
 .idea/
 db.sqlite3
-staticfiles/
 .swp
