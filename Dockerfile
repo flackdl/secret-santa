@@ -1,4 +1,4 @@
-FROM python:3.8-buster
+FROM python:3.10-buster
 ADD . /app
 WORKDIR /app
 RUN pip install -U pip
