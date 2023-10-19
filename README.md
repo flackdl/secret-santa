@@ -4,8 +4,7 @@ A simple web app that randomly assigns secret santa recipients and emails the re
 
 I built this to test out [vue.js](https://vuejs.org).  The backend is running [flask](https://github.com/pallets/flask).
 
-It's [hosted](http://sloppy-santa.herokuapp.com) on heroku for free and is using [sendgrid](http://sendgrid.com) for the email service.
-
+It uses [sendgrid](http://sendgrid.com) for the email service.
 
 ## Deployment
 
