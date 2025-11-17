@@ -4,17 +4,17 @@ A simple web app that randomly assigns secret santa recipients and emails the re
 
 I built this to test out [vue.js](https://vuejs.org).  The backend is running [flask](https://github.com/pallets/flask).
 
-It uses [sendgrid](http://sendgrid.com) for the email service.
+It uses [mailersend](https://github.com/mailersend/mailersend-python) for the email service.
 
 ## Deployment
 
 Populate an `.env` file with your Sendgrid Api Key, something like:
 
-    SENDGRID_API_KEY=123abc
+    MAILERSEND_API_KEY=123abc
 
 Start app:
 
-    docker-compose up -d --build
+    docker compose up -d --build
 
 And it'll be accessible at http://localhost:8080
 
