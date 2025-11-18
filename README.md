@@ -4,13 +4,13 @@ A simple web app that randomly assigns secret santa recipients and emails the re
 
 I built this to test out [vue.js](https://vuejs.org).  The backend is running [flask](https://github.com/pallets/flask).
 
-It uses [mailersend](https://github.com/mailersend/mailersend-python) for the email service.
+It uses [brevo](https://app.brevo.com/) for the email service.
 
 ## Deployment
 
 Populate an `.env` file with your Sendgrid Api Key, something like:
 
-    MAILERSEND_API_KEY=123abc
+    BREVO_SMTP_KEY=123abc
 
 Start app:
 

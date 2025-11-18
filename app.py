@@ -1,13 +1,13 @@
 import os
+import ssl
+import smtplib
 from dotenv import load_dotenv
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Flask, request, render_template, jsonify, send_from_directory
-from mailersend import MailerSendClient, EmailBuilder
 
 # load env variables
 load_dotenv()
-
-# set up the mailer-send client
-ms = MailerSendClient()
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -35,26 +35,31 @@ def send_emails():
 
     for assignment in assignments:
 
-        subject = "Ssshhh...{}, this is your Secret Santa recipient".format(assignment['buyer']['name'])
+        subject = "Ssh...{}, this is your Secret Santa recipient".format(assignment['buyer']['name'])
         content = "Your Secret Santa recipient is %s!" % assignment['recipient']['name']
+
+        msg = MIMEMultipart()
+        msg['From'] = 'secret-santa@eerieemu.com'
+        msg['To'] = assignment['buyer']['email']
+        msg['Subject'] = subject
+
+        # attach the body of the email as plain text
+        msg.attach(MIMEText(content, 'plain'))
 
         app.logger.info('%s buys for %s' % (assignment['buyer']['email'], assignment['recipient']['name']))
 
         try:
-            email = (
-                EmailBuilder()
-                .from_email("secret-santa@test-68zxl2707634j905.mlsender.net", "Secret Santa")
-                .to_many([{"email": assignment['buyer']['email'], "name": assignment['buyer']['name']}])
-                .subject(subject)
-                .html(content)
-                .text(content)
-                .build()
-            )
+            with smtplib.SMTP('smtp-relay.brevo.com', 587, timeout=10) as server:
 
-            response = ms.emails.send(email)
+                # secure the connection with TLS
+                server.starttls(context=ssl.create_default_context())
 
-            if response.status_code < 200 or response.status_code >= 300:
-                raise Exception(response.body)
+                # authenticate to the smtp server
+                server.login('9bda5b001@smtp-brevo.com', os.environ['BREVO_SMTP_KEY'])
+
+                # send the email
+                text = msg.as_string()
+                server.sendmail('secret-santa@eerieemu.com', assignment['buyer']['email'], text)
 
             print(f"successfully sent email to {assignment['buyer']['email']}")
 
